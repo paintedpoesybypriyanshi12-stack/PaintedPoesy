@@ -17,7 +17,7 @@ Planned address: `paintedpoesybypriyanshi.com` (domain not yet connected).
 | **Privacy** | The privacy notice, linked from the footer. |
 
 It is a plain static website: HTML, CSS and JavaScript with no build step, so it can
-be hosted anywhere (GitLab Pages, Netlify and so on). It adapts to phones, tablets and
+be hosted on any static host. It adapts to phones, tablets and
 laptops, and follows the visitor's light or dark setting on the inner pages.
 
 ## Folder layout
@@ -109,6 +109,13 @@ After changing `assets/*.js`, `assets/style.css` or the animation image, raise t
 `?v=` number on their links in `index.html` (for example `?v=13` to `?v=14`), and the
 matching number in `flow-sapphire.js`. That makes visitors' browsers fetch the new
 files instead of reusing old saved copies.
+
+## Deployment
+
+The site is hosted on Porkbun Static Hosting, connected to this GitHub repository's
+`main` branch through Porkbun's GitHub Connect: every commit pushed to `main` updates the
+live site. There is no build step; the files are served exactly as they are in the
+repository.
 
 ## About the home-page animation
 
