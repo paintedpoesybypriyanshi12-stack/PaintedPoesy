@@ -12,7 +12,7 @@ window.SITE = {
 
   // Form service endpoint (e.g. a Formspree form URL). While empty, the form
   // says it is not connected instead of pretending to send.
-  formEndpoint: "",
+  formEndpoint: "https://formspree.io/f/mzerdnrl",
 
   contactEmail: "paintedpoesybypriyanshi12@gmail.com",
   instagram: "https://www.instagram.com/priartgram",
