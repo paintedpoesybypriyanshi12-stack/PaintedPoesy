@@ -1,93 +1,107 @@
-# PaintedPoesy
+# Painted Poesy by Priyanshi
 
+The website for **Painted Poesy by Priyanshi**: contemporary mixed-media paintings by
+Priyanshi Pandey, Dallas, Texas. The site centres on the current series, **Navarathna**:
+nine paintings inspired by the nine gems of the Indian Navaratna tradition.
 
+Planned address: `paintedpoesybypriyanshi.com` (domain not yet connected).
 
-## Getting started
+## What's on the site
 
-To make it easy for you to get started with GitLab, here's a list of recommended next steps.
+| Page | What it shows |
+|---|---|
+| **Home** | A full-screen, slowly flowing animation made from the Blue Sapphire painting, the headline, and links to the three sections. |
+| **About Me** | Priyanshi's story, practice and process, with close-up photographs. |
+| **Navarathna** | The series introduction, the tradition behind it, and all nine works with their descriptions. Each painting opens into a larger view. |
+| **Contact Us** | A pop-up form, available from every page. |
+| **Privacy** | The privacy notice, linked from the footer. |
 
-Already a pro? Just edit this README.md and make it your own. Want to make it easy? [Use the template at the bottom](#editing-this-readme)!
+It is a plain static website: HTML, CSS and JavaScript with no build step, so it can
+be hosted anywhere (GitLab Pages, Netlify and so on). It adapts to phones, tablets and
+laptops, and follows the visitor's light or dark setting on the inner pages.
 
-## Add your files
-
-* [Create](https://docs.gitlab.com/user/project/repository/web_editor/#create-a-file) or [upload](https://docs.gitlab.com/user/project/repository/web_editor/#upload-a-file) files
-* [Add files using the command line](https://docs.gitlab.com/topics/git/add_files/#add-files-to-a-git-repository) or push an existing Git repository with the following command:
+## Folder layout
 
 ```
-cd existing_repo
-git remote add origin https://gitlab.com/paintedpoesy-group1/paintedpoesy.git
-git branch -M main
-git push -uf origin main
+index.html                 All pages (Home, About, Navarathna, Privacy) in one file
+assets/
+  works.js                 ← Site settings and all painting details (edit this one)
+  app.js                   Page switching, gallery, pop-ups, contact form
+  style.css                Colours, fonts and layout
+  flow-sapphire.js         The animated background on the home page
+images/
+  works/                   The main photograph of each painting
+  detail/                  Close-ups used in pop-ups and on the About page
+  flow/sapphire-full.jpg   Source image for the home-page animation
 ```
 
-## Integrate with your tools
+## Common updates
 
-* [Set up project integrations](https://gitlab.com/paintedpoesy-group1/paintedpoesy/-/settings/integrations)
+Almost everything you will want to change lives in **`assets/works.js`**.
 
-## Collaborate with your team
+**Painting details.** Each painting has an entry with its gem, traditional association,
+heading line, description, photo and alt text (the description read aloud to visitors
+using screen readers). Shared details are set once near the bottom of the file:
 
-* [Invite team members and collaborators](https://docs.gitlab.com/user/project/members/)
-* [Create a new merge request](https://docs.gitlab.com/user/project/merge_requests/creating_merge_requests/)
-* [Automatically close issues from merge requests](https://docs.gitlab.com/user/project/issues/managing_issues/#closing-issues-automatically)
-* [Enable merge request approvals](https://docs.gitlab.com/user/project/merge_requests/approvals/)
-* [Set auto-merge](https://docs.gitlab.com/user/project/merge_requests/auto_merge/)
+```js
+year: 2026,
+medium: "Mixed media on canvas",
+dimensions: "5 × 4 ft",
+availability: "Available",   // set to "Sold" to show "This painting has found a home."
+```
 
-## Test and Deploy
+Any of these can also be set on an individual painting to override the shared value.
 
-Use the built-in continuous integration in GitLab.
+**Adding or replacing a photo.**
+1. Export the photo as a JPEG about **2000 px** on its longest side (under 1 MB is ideal;
+   full 300 dpi print files are too large for the web).
+2. Save it in `images/works/`, for example `images/works/cats-eye.jpg`.
+3. In `works.js`, point that painting's `image:` to the new file and update its `alt:` text.
 
-* [Get started with GitLab CI/CD](https://docs.gitlab.com/ci/quick_start/)
-* [Analyze your code for known vulnerabilities with Static Application Security Testing (SAST)](https://docs.gitlab.com/user/application_security/sast/)
-* [Deploy to Kubernetes, Amazon EC2, or Amazon ECS using Auto Deploy](https://docs.gitlab.com/topics/autodevops/requirements/)
-* [Use pull-based deployments for improved Kubernetes management](https://docs.gitlab.com/user/clusters/agent/)
-* [Set up protected environments](https://docs.gitlab.com/ci/environments/protected_environments/)
+*Still to do:* **Cat's-eye** uses an older phone photo (`images/works/midnight.jpg`)
+until its professional photograph is ready. When it is, follow the steps above and set
+`gemConfirmed: true` on its entry.
 
-***
+**Contact form.** The form needs a form service to deliver messages. Create a form with a
+service such as Formspree, then put its address in `formEndpoint` at the top of
+`works.js`. Until then, the form explains that it is not connected yet.
 
-# Editing this README
+**Draft markers.** While `draft: true` is set at the top of `works.js`, unconfirmed
+details show a small "To confirm" tag and the privacy notice shows its bracketed
+placeholders. Set it to `false` before launch.
 
-When you're ready to make this README your own, just edit this file and use the handy template below (or feel free to structure it however you want - this is just a starting point!). Thanks to [makeareadme.com](https://www.makeareadme.com/) for this template.
+**Privacy notice.** The bracketed parts in the Privacy section of `index.html` (hosting
+provider, form provider, analytics, retention, privacy requests) need filling in to
+match the services actually used.
 
-## Suggestions for a good README
+## Seeing changes in a browser
 
-Every project is different, so consider which of these sections apply to yours. The sections used in the template are suggestions for most open source projects. Also keep in mind that while a README can be too long and detailed, too long is better than too short. If you think your README is too long, consider utilizing another form of documentation rather than cutting out information.
+Browsers block the home-page animation when `index.html` is opened directly from the
+computer (the rest of the site works). To see everything, run a small local server
+from this folder:
 
-## Name
-Choose a self-explaining name for your project.
+```
+python3 -m http.server 8000
+```
 
-## Description
-Let people know what your project can do specifically. Provide context and add a link to any reference visitors might be unfamiliar with. A list of Features or a Background subsection can also be added here. If there are alternatives to your project, this is a good place to list differentiating factors.
+then open <http://localhost:8000>.
 
-## Badges
-On some READMEs, you may see small images that convey metadata, such as whether or not all the tests are passing for the project. You can use Shields to add some to your README. Many services also have instructions for adding a badge.
+After changing `assets/*.js`, `assets/style.css` or the animation image, raise the
+`?v=` number on their links in `index.html` (for example `?v=13` to `?v=14`), and the
+matching number in `flow-sapphire.js`. That makes visitors' browsers fetch the new
+files instead of reusing old saved copies.
 
-## Visuals
-Depending on what you are making, it can be a good idea to include screenshots or even a video (you'll frequently see GIFs rather than actual videos). Tools like ttygif can help, but check out Asciinema for a more sophisticated method.
+## About the home-page animation
 
-## Installation
-Within a particular ecosystem, there may be a common way of installing things, such as using Yarn, NuGet, or Homebrew. However, consider the possibility that whoever is reading your README is a novice and would like more guidance. Listing specific steps helps remove ambiguity and gets people to using your project as quickly as possible. If it only runs in a specific context like a particular programming language version or operating system or has dependencies that have to be installed manually, also add a Requirements subsection.
+`assets/flow-sapphire.js` brings the Blue Sapphire painting to life in the browser using
+WebGL. Its marbled paint flows along the direction of its own veins, while the crystal
+clusters are held almost still so they stay crisp, and a slow light catches the gold and
+the facets. It is a seamless 90-second loop that opens on the same frame on every visit.
+It stays still for visitors whose devices ask for reduced motion (they can still press
+**Play motion**), and shows a soft blue placeholder while the image loads or if the
+device cannot run it.
 
-## Usage
-Use examples liberally, and show the expected output if you can. It's helpful to have inline the smallest example of usage that you can demonstrate, while providing links to more sophisticated examples if they are too long to reasonably include in the README.
+## Credits
 
-## Support
-Tell people where they can go to for help. It can be any combination of an issue tracker, a chat room, an email address, etc.
-
-## Roadmap
-If you have ideas for releases in the future, it is a good idea to list them in the README.
-
-## Contributing
-State if you are open to contributions and what your requirements are for accepting them.
-
-For people who want to make changes to your project, it's helpful to have some documentation on how to get started. Perhaps there is a script that they should run or some environment variables that they need to set. Make these steps explicit. These instructions could also be useful to your future self.
-
-You can also document commands to lint the code or run tests. These steps help to ensure high code quality and reduce the likelihood that the changes inadvertently break something. Having instructions for running tests is especially helpful if it requires external setup, such as starting a Selenium server for testing in a browser.
-
-## Authors and acknowledgment
-Show your appreciation to those who have contributed to the project.
-
-## License
-For open source projects, say how it is licensed.
-
-## Project status
-If you have run out of energy or time for your project, put a note at the top of the README saying that development has slowed down or stopped completely. Someone may choose to fork your project or volunteer to step in as a maintainer or owner, allowing your project to keep going. You can also make an explicit request for maintainers.
+Artwork, photographs and writing © Priyanshi Pandey. All rights reserved. The artwork
+and images may not be reproduced without permission.
