@@ -10,9 +10,22 @@ window.SITE = {
   // bracketed template text stays visible. Set to false before launch.
   draft: true,
 
-  // Form service endpoint (e.g. a Formspree form URL). While empty, the form
-  // says it is not connected instead of pretending to send.
-  formEndpoint: "https://formspree.io/f/mzerdnrl",
+  // Contact form, delivered by Web3Forms (free plan) to the inbox the access
+  // key was created for (paintedpoesybypriyanshi12@gmail.com).
+  // The access key is a PUBLIC form identifier, not a password: it is sent
+  // from the visitor's browser, so anyone can see it in the page source.
+  // That is how Web3Forms is designed; the key can only deliver to the inbox
+  // it was verified for. While accessKey is empty, the form says it is not
+  // connected and sends nothing.
+  web3forms: {
+    endpoint: "https://api.web3forms.com/submit",
+    accessKey: "a2dce3ab-458c-4b43-8254-f53101a63f39",
+    subject: "New inquiry — Painted Poesy by Priyanshi",
+    fromName: "Painted Poesy website", // display name on the notification, never the visitor's
+    // Free hCaptcha spam check, loaded through Web3Forms' own script. It must
+    // ALSO be switched on for this form in the Web3Forms dashboard.
+    hcaptcha: true,
+  },
 
   contactEmail: "paintedpoesybypriyanshi12@gmail.com",
   instagram: "https://www.instagram.com/priartgram",

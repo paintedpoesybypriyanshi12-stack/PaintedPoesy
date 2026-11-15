@@ -40,10 +40,9 @@
       </div>
     </article>`).join("");
 
-  /* ---------- Contact select ---------- */
-  $("#c-work").insertAdjacentHTML("beforeend",
-    WORKS.map(w => `<option value="${esc(titleOf(w))}">${esc(titleOf(w))}</option>`).join("") +
-    `<option value="Not sure yet">Not sure yet</option>`);
+  // The painting a visitor is asking about, when the form is opened from a
+  // painting's "Inquire About This Work" button; sent with the message.
+  let inquiryWork = null;
 
   /* ---------- Dialogs ---------- */
   const artDlg = $("#artwork"), contactDlg = $("#contact");
@@ -81,7 +80,7 @@
     $("#contact-intro").textContent = w
       ? `Ask about this ${w.dimensions} painting’s availability, pricing, or details. The artwork title is already included with your inquiry.`
       : DEFAULT_INTRO;
-    if (w) { $("#c-work").value = titleOf(w); $("#c-type").value = "An artwork inquiry"; }
+    inquiryWork = w ? titleOf(w) : null;
     openDialog(contactDlg);
     setTimeout(() => $("#c-name").focus(), 30);
   }
@@ -123,39 +122,123 @@
     openDialog(artDlg);
   }
 
-  /* ---------- Contact form ---------- */
-  const EMAIL = /^[^@\s]+@[^@\s]+\.[^@\s]+$/;
-  $("#contact-form").addEventListener("submit", async e => {
+  /* ---------- Contact form (Web3Forms) ---------- */
+  // Submits in the background to Web3Forms, which emails the inquiry to the
+  // inbox the access key was verified for. The visitor's address goes in the
+  // `email` field, which Web3Forms uses as the Reply-To; the sender name is
+  // the site's own (`from_name`), never the visitor's.
+  const FORM = SITE.web3forms || {};
+  const MSG_SUCCESS = "Thank you for reaching out to Painted Poesy by Priyanshi. Your inquiry has been received, and I’ll be in touch soon.";
+  const MSG_FAILURE = "Your message couldn’t be sent. Please try again or email paintedpoesybypriyanshi12@gmail.com.";
+  const EMAIL = /^[^\s@]+@[^\s@]+\.[^\s@]{2,}$/;
+  const LIMITS = { name: 100, email: 254, message: 3000 };
+  const form = $("#contact-form"), status = $("#c-status"), sendBtn = $("#c-send");
+  const msgBox = $("#c-msg"), msgCount = $("#c-msg-count");
+  let sending = false;
+
+  // Free hCaptcha through Web3Forms' own script (zero-config on the free plan).
+  if (FORM.hcaptcha) {
+    $("#c-captcha-wrap").hidden = false;
+    const dark = document.documentElement.dataset.theme === "dark" ||
+      (!document.documentElement.dataset.theme && matchMedia("(prefers-color-scheme: dark)").matches);
+    $("#c-captcha").setAttribute("data-theme", dark ? "dark" : "light");
+    const s = document.createElement("script");
+    s.src = "https://web3forms.com/client/script.js"; s.async = true; s.defer = true;
+    document.body.appendChild(s);
+  }
+  const captchaToken = () => (form.querySelector('textarea[name="h-captcha-response"]') || {}).value || "";
+  const resetCaptcha = () => { try { window.hcaptcha && window.hcaptcha.reset(); } catch (_) {} };
+
+  function setFieldError(input, errEl, text) {
+    errEl.textContent = text || ""; errEl.hidden = !text;
+    if (input) input.setAttribute("aria-invalid", text ? "true" : "false");
+  }
+  function clearErrors() {
+    setFieldError($("#c-name"), $("#c-name-err"));
+    setFieldError($("#c-email"), $("#c-email-err"));
+    setFieldError(msgBox, $("#c-msg-err"));
+    setFieldError(null, $("#c-captcha-err"));
+  }
+  function setStatus(kind, text) { status.className = "form-status" + (kind ? " " + kind : ""); status.textContent = text || ""; }
+  function updateCount() { msgCount.textContent = `${msgBox.value.length} / ${LIMITS.message}`; }
+  msgBox.addEventListener("input", updateCount); updateCount();
+  // Clear a field's error as soon as the visitor edits it.
+  [["#c-name", "#c-name-err"], ["#c-email", "#c-email-err"], ["#c-msg", "#c-msg-err"]].forEach(([i, e]) =>
+    $(i).addEventListener("input", () => { if ($(i).getAttribute("aria-invalid") === "true") setFieldError($(i), $(e)); }));
+
+  function validate() {
+    const name = $("#c-name").value.trim(), email = $("#c-email").value.trim(), msg = msgBox.value.trim();
+    const errs = [];
+    if (!name) errs.push(["#c-name", "#c-name-err", "Please enter your name."]);
+    else if (name.length > LIMITS.name) errs.push(["#c-name", "#c-name-err", `Please keep your name under ${LIMITS.name} characters.`]);
+    if (!email) errs.push(["#c-email", "#c-email-err", "Please enter your email address."]);
+    else if (email.length > LIMITS.email || !EMAIL.test(email)) errs.push(["#c-email", "#c-email-err", "Please enter a valid email address, like name@example.com."]);
+    if (!msg) errs.push(["#c-msg", "#c-msg-err", "Please add a message before sending."]);
+    else if (msg.length > LIMITS.message) errs.push(["#c-msg", "#c-msg-err", `Please keep your message under ${LIMITS.message} characters.`]);
+    errs.forEach(([i, e, t]) => setFieldError($(i), $(e), t));
+    return { ok: !errs.length, first: errs[0] && errs[0][0], name, email, msg };
+  }
+
+  form.addEventListener("submit", async e => {
     e.preventDefault();
-    const f = e.target, status = $("#c-status");
-    const name = f.name.value.trim(), email = f.email.value.trim(), msg = f.message.value.trim();
-    const invalid = !name ? ["Please enter your name.", "#c-name"]
-      : !EMAIL.test(email) ? ["Please enter a valid email address.", "#c-email"]
-      : !msg ? ["Please add a message before sending.", "#c-msg"] : null;
-    if (invalid) {
-      status.className = "form-status warn"; status.textContent = invalid[0]; $(invalid[1]).focus();
+    if (sending) return;                                   // duplicate-submit guard
+    clearErrors(); setStatus("", "");
+    const v = validate();
+    if (!v.ok) { setStatus("warn", "Please check the highlighted fields."); $(v.first).focus(); return; }
+    if (!FORM.accessKey) {
+      setStatus("warn", "The contact form isn’t connected yet, so nothing was sent. Please email paintedpoesybypriyanshi12@gmail.com.");
       return;
     }
-    if (!SITE.formEndpoint) {
-      status.className = "form-status warn";
-      status.textContent = "This preview isn’t connected to a form service yet, so nothing was sent. Add one in works.js to receive inquiries.";
+    const token = captchaToken();
+    if (FORM.hcaptcha && window.hcaptcha && !token) {
+      setFieldError(null, $("#c-captcha-err"), "Please complete the verification check above.");
+      setStatus("warn", "Please complete the verification check before sending.");
       return;
     }
-    const btn = $("#c-send"); btn.disabled = true; btn.textContent = "Sending your message…";
+
+    const payload = {
+      access_key: FORM.accessKey,
+      subject: FORM.subject,
+      from_name: FORM.fromName,
+      name: v.name,
+      email: v.email,                                      // Web3Forms uses this as Reply-To
+      message: v.msg,
+    };
+    if (inquiryWork) payload.artwork = inquiryWork;
+    if (token) payload["h-captcha-response"] = token;
+
+    sending = true;
+    sendBtn.disabled = true; sendBtn.textContent = "Sending your message…";
+    form.setAttribute("aria-busy", "true");
+    const ctrl = new AbortController(), timer = setTimeout(() => ctrl.abort(), 20000);
+    let ok = false;
     try {
-      const res = await fetch(SITE.formEndpoint, {
-        method: "POST", headers: { "Content-Type": "application/json", Accept: "application/json" },
-        body: JSON.stringify(Object.fromEntries(new FormData(f))),
+      const res = await fetch(FORM.endpoint, {
+        method: "POST",
+        headers: { "Content-Type": "application/json", Accept: "application/json" },
+        body: JSON.stringify(payload),
+        signal: ctrl.signal,
       });
-      if (!res.ok) throw new Error(res.status);
-      f.reset();
-      status.className = "form-status ok";
-      status.innerHTML = "<strong>Thank you for reaching out.</strong> Your message has been sent. I look forward to reading it and continuing the conversation.";
+      let data = null;
+      try { data = await res.json(); } catch (_) { /* non-JSON error page */ }
+      // Success only when the HTTP status is OK *and* Web3Forms says success.
+      ok = res.ok && !!data && data.success === true;
+      if (!ok) console.warn("Web3Forms did not accept the submission:", res.status, data && (data.message || (data.body && data.body.message)));
     } catch (err) {
-      status.className = "form-status warn";
-      status.textContent = "Your message could not be sent. Please try again" +
-        (SITE.contactEmail ? `, or contact me directly at ${SITE.contactEmail}.` : ".");
-    } finally { btn.disabled = false; btn.textContent = "Send Inquiry"; }
+      console.warn("Contact form request failed:", err);
+    } finally {
+      clearTimeout(timer);
+      sending = false;
+      sendBtn.disabled = false; sendBtn.textContent = "Send Inquiry";
+      form.removeAttribute("aria-busy");
+    }
+    if (ok) {
+      form.reset(); updateCount();
+      setStatus("ok", MSG_SUCCESS);
+    } else {
+      setStatus("warn", MSG_FAILURE);                      // the visitor's input is kept as typed
+    }
+    resetCaptcha();                                        // a captcha token can only be used once
   });
 
   /* ---------- Flow background ---------- */

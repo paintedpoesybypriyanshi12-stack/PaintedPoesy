@@ -384,3 +384,16 @@ form.contact { display: grid; gap: 1rem; margin-top: .5rem; }
   .home-nav a, .home-nav button { font-size: 1.25rem; }
   .home-foot { font-size: .875rem; }
 }
+
+/* ---------- Contact form: validation, counter, captcha ---------- */
+.field .req { color: var(--accent); }
+.field .opt { text-transform: none; letter-spacing: 0; color: var(--muted); font-weight: 400; }
+.field input[aria-invalid="true"], .field textarea[aria-invalid="true"] {
+  border-color: var(--accent); box-shadow: 0 0 0 3px color-mix(in srgb, var(--accent) 18%, transparent);
+}
+.field-error { margin: 0; font-size: .8125rem; color: var(--accent); }
+.field-error::before { content: "! "; font-weight: 600; }
+.field-foot { display: flex; justify-content: space-between; align-items: start; gap: 1rem; }
+.field-foot .count { margin-left: auto; font-size: .75rem; color: var(--muted); font-variant-numeric: tabular-nums; }
+.captcha-wrap { display: grid; gap: .4rem; min-height: 0; overflow-x: auto; }
+form.contact[aria-busy="true"] .btn { opacity: .7; cursor: progress; }

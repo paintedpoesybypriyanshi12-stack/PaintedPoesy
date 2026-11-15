@@ -62,9 +62,28 @@ Any of these can also be set on an individual painting to override the shared va
 until its professional photograph is ready. When it is, follow the steps above and set
 `gemConfirmed: true` on its entry.
 
-**Contact form.** The form needs a form service to deliver messages. Create a form with a
-service such as Formspree, then put its address in `formEndpoint` at the top of
-`works.js`. Until then, the form explains that it is not connected yet.
+**Contact form.** Messages are delivered by [Web3Forms](https://web3forms.com) (free plan)
+to paintedpoesybypriyanshi12@gmail.com. Settings are in `web3forms` at the top of
+`works.js`:
+
+- `accessKey`: the Web3Forms access key created for that inbox. It is a public form
+  identifier, not a password: it is sent from the visitor's browser, so it is visible in
+  the page source, which is how Web3Forms is designed. While it is empty the form says it
+  is not connected and sends nothing.
+- `subject`, `fromName`: the notification's subject line and sender display name. The
+  visitor's address is sent as `email`, which Web3Forms uses as the Reply-To, so pressing
+  Reply answers the visitor.
+- `hcaptcha`: the free hCaptcha check, loaded through Web3Forms. It must also be switched
+  on for the form in the Web3Forms dashboard.
+
+The free plan allows 250 submissions a month; Web3Forms emails a warning at 90% and 100%,
+and the dashboard at app.web3forms.com shows usage.
+
+**Tests.** `tests/contact-form.mock.html` checks the contact form against a fake Web3Forms
+(validation, loading state, duplicate submits, success and every failure type). It sends
+nothing and delivers no email. Run a local server (below) and open
+<http://localhost:8000/tests/contact-form.mock.html>; it prints PASS/FAIL for each check.
+Only a real submission proves an email arrives.
 
 **Draft markers.** While `draft: true` is set at the top of `works.js`, unconfirmed
 details show a small "To confirm" tag and the privacy notice shows its bracketed
