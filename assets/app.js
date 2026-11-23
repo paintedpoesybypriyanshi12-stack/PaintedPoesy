@@ -5,7 +5,6 @@
   const esc = s => String(s).replace(/[&<>"]/g, c => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;" }[c]));
   const tag = (t = "To confirm") => SITE.draft ? ` <span class="draft-tag">${t}</span>` : "";
   const titleOf = w => w.title || w.gem;
-  const sold = w => /sold/i.test(w.availability || "");
 
   document.documentElement.classList.toggle("draft", !!SITE.draft);
   $("#year").textContent = new Date().getFullYear();
@@ -40,10 +39,6 @@
       </div>
     </article>`).join("");
 
-  // The painting a visitor is asking about, when the form is opened from a
-  // painting's "Inquire About This Work" button; sent with the message.
-  let inquiryWork = null;
-
   /* ---------- Dialogs ---------- */
   const artDlg = $("#artwork"), contactDlg = $("#contact");
   const openDialog = d => { if (!d.open) { d.showModal(); document.body.style.overflow = "hidden"; } };
@@ -61,7 +56,6 @@
     const c = t.closest("[data-close]"); if (c) closeDialog(c.closest("dialog"));
     if (t.closest("[data-close-link]")) closeDialog(contactDlg);
     if (t.closest("[data-contact]")) openContact();
-    const inq = t.closest("[data-inquire]"); if (inq) openContact(inq.dataset.inquire);
     const w = t.closest("[data-work]"); if (w) location.hash = "#/navarathna/" + w.dataset.work;
     const j = t.closest("[data-jump]");
     if (j) {
@@ -72,15 +66,11 @@
   });
 
   const DEFAULT_TITLE = $("#contact-title").textContent, DEFAULT_INTRO = $("#contact-intro").textContent;
-  function openContact(workId) {
-    const w = workId && WORKS.find(x => x.id === workId);
+  function openContact() {
     closeDialog(artDlg);
     const st = $("#c-status"); st.textContent = ""; st.className = "form-status";
-    $("#contact-title").textContent = w ? `A conversation about ${titleOf(w)}` : DEFAULT_TITLE;
-    $("#contact-intro").textContent = w
-      ? `Ask about this ${w.dimensions} painting’s availability, pricing, or details. The artwork title is already included with your inquiry.`
-      : DEFAULT_INTRO;
-    inquiryWork = w ? titleOf(w) : null;
+    $("#contact-title").textContent = DEFAULT_TITLE;
+    $("#contact-intro").textContent = DEFAULT_INTRO;
     openDialog(contactDlg);
     setTimeout(() => $("#c-name").focus(), 30);
   }
@@ -109,11 +99,6 @@
       `<dt>Series</dt><dd>Navarathna</dd>` + facts(w) +
       (SITE.draft && !w.year ? `<dt>Year</dt><dd class="todo">[Year completed]</dd>` : "");
     $("#art-desc").innerHTML = w.statement.map(p => `<p>${esc(p)}</p>`).join("");
-    $("#art-inquiry").innerHTML = sold(w)
-      ? `<h3>This painting has found a home.</h3><p>You are welcome to get in touch about other works in the series.</p>
-         <button type="button" class="btn ghost" data-contact>Get in Touch</button>`
-      : `<h3>Interested in this work?</h3><p>Get in touch to ask about availability, pricing, or viewing the painting in greater detail.</p>
-         <button type="button" class="btn" data-inquire="${w.id}">Inquire About This Work</button>`;
     const prev = WORKS[(i - 1 + WORKS.length) % WORKS.length], next = WORKS[(i + 1) % WORKS.length];
     $("#art-prev").onclick = () => { location.hash = "#/navarathna/" + prev.id; };
     $("#art-next").onclick = () => { location.hash = "#/navarathna/" + next.id; };
@@ -136,18 +121,6 @@
   const msgBox = $("#c-msg"), msgCount = $("#c-msg-count");
   let sending = false;
 
-  // Free hCaptcha through Web3Forms' own script (zero-config on the free plan).
-  if (FORM.hcaptcha) {
-    $("#c-captcha-wrap").hidden = false;
-    const dark = document.documentElement.dataset.theme === "dark" ||
-      (!document.documentElement.dataset.theme && matchMedia("(prefers-color-scheme: dark)").matches);
-    $("#c-captcha").setAttribute("data-theme", dark ? "dark" : "light");
-    const s = document.createElement("script");
-    s.src = "https://web3forms.com/client/script.js"; s.async = true; s.defer = true;
-    document.body.appendChild(s);
-  }
-  const captchaToken = () => (form.querySelector('textarea[name="h-captcha-response"]') || {}).value || "";
-  const resetCaptcha = () => { try { window.hcaptcha && window.hcaptcha.reset(); } catch (_) {} };
 
   function setFieldError(input, errEl, text) {
     errEl.textContent = text || ""; errEl.hidden = !text;
@@ -157,7 +130,6 @@
     setFieldError($("#c-name"), $("#c-name-err"));
     setFieldError($("#c-email"), $("#c-email-err"));
     setFieldError(msgBox, $("#c-msg-err"));
-    setFieldError(null, $("#c-captcha-err"));
   }
   function setStatus(kind, text) { status.className = "form-status" + (kind ? " " + kind : ""); status.textContent = text || ""; }
   function updateCount() { msgCount.textContent = `${msgBox.value.length} / ${LIMITS.message}`; }
@@ -189,12 +161,6 @@
       setStatus("warn", "The contact form isn’t connected yet, so nothing was sent. Please email paintedpoesybypriyanshi12@gmail.com.");
       return;
     }
-    const token = captchaToken();
-    if (FORM.hcaptcha && window.hcaptcha && !token) {
-      setFieldError(null, $("#c-captcha-err"), "Please complete the verification check above.");
-      setStatus("warn", "Please complete the verification check before sending.");
-      return;
-    }
 
     const payload = {
       access_key: FORM.accessKey,
@@ -204,8 +170,6 @@
       email: v.email,                                      // Web3Forms uses this as Reply-To
       message: v.msg,
     };
-    if (inquiryWork) payload.artwork = inquiryWork;
-    if (token) payload["h-captcha-response"] = token;
 
     sending = true;
     sendBtn.disabled = true; sendBtn.textContent = "Sending your message…";
@@ -238,7 +202,6 @@
     } else {
       setStatus("warn", MSG_FAILURE);                      // the visitor's input is kept as typed
     }
-    resetCaptcha();                                        // a captcha token can only be used once
   });
 
   /* ---------- Flow background ---------- */

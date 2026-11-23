@@ -21,10 +21,6 @@ document.getElementById("f").onload = async () => {
     if (delay) await sleep(delay);
     return nextResponse();
   };
-  // Stand-in for a completed hCaptcha (the real widget needs a human).
-  w.hcaptcha = { reset() { w.__captchaReset = (w.__captchaReset || 0) + 1; } };
-  let tok = d.querySelector('textarea[name="h-captcha-response"]');
-  if (!tok) { tok = d.createElement("textarea"); tok.name = "h-captcha-response"; tok.hidden = true; form.appendChild(tok); }
   const cfg = w.SITE.web3forms;
   const json = (status, obj) => () => new w.Response(JSON.stringify(obj), { status, headers: { "Content-Type": "application/json" } });
   const fill = (n, e, m) => { $("#c-name").value = n; $("#c-email").value = e; $("#c-msg").value = m; };
@@ -33,7 +29,7 @@ document.getElementById("f").onload = async () => {
     for (let i = 0; i < 100 && (btn.disabled || form.getAttribute("aria-busy")); i++) await sleep(20);
     await sleep(20);
   }
-  const reset = () => { calls = []; delay = 0; form.reset(); status.textContent = ""; tok.value = "tok-123"; cfg.accessKey = "TEST-KEY"; };
+  const reset = () => { calls = []; delay = 0; form.reset(); status.textContent = ""; cfg.accessKey = "TEST-KEY"; };
   d.querySelector("[data-contact]").click(); await sleep(80);   // open the pop-up like a visitor
   check("Contact Us opens the pop-up", $("#contact").open);
 
@@ -59,10 +55,6 @@ document.getElementById("f").onload = async () => {
   reset(); cfg.accessKey = ""; fill("Asha", "asha@example.com", "Hello"); await submitAndWait();
   check("no access key: nothing sent, explains not connected", calls.length === 0 && /isn’t connected/.test(status.textContent));
 
-  // 5. captcha not completed
-  reset(); tok.value = ""; fill("Asha", "asha@example.com", "Hello"); await submitAndWait();
-  check("captcha not completed: blocked with message", calls.length === 0 && !$("#c-captcha-err").hidden);
-
   // 6. success
   reset(); fill("Asha Rao", "asha@example.com", "I love Emerald.");
   nextResponse = json(200, { success: true, body: { message: "Email sent successfully!" } });
@@ -77,11 +69,9 @@ document.getElementById("f").onload = async () => {
   check("payload: from_name is the site, not the visitor", b && b.from_name === "Painted Poesy website");
   check("payload: only name/email/message from the visitor (no removed fields)", b && !("inquiry_type" in b) && !("artwork_of_interest" in b) && !("artwork" in b));
   check("form: inquiry type and artwork fields removed", !$("#c-type") && !$("#c-work"));
-  check("payload: hCaptcha token forwarded", b && b["h-captcha-response"] === "tok-123");
   check("payload: no paid/unwanted fields", b && !("ccemail" in b) && !("attachment" in b) && !("botcheck" in b) && !("replyto" in b));
   check("success: exact success message", status.textContent === "Thank you for reaching out to Painted Poesy by Priyanshi. Your inquiry has been received, and I’ll be in touch soon.");
   check("success: form cleared", $("#c-name").value === "" && $("#c-msg").value === "");
-  check("success: captcha reset for next use", (w.__captchaReset || 0) >= 1);
 
   const failCase = async (label, resp, opts = {}) => {
     reset(); fill("Asha", "asha@example.com", "Keep this text");
@@ -112,21 +102,20 @@ document.getElementById("f").onload = async () => {
   for (let i = 0; i < 60 && btn.disabled; i++) await sleep(20);
   check("double submit: only one request sent", calls.length === 1, "calls=" + calls.length);
 
-  // 13. inquiring from a painting sends its name with the message
+  // 13. a painting's larger view has no inquiry box, and Contact Us sends no painting
   reset(); $("#contact").close(); w.location.hash = "#/navarathna/ruby"; await sleep(120);
-  d.querySelector("[data-inquire]").click(); await sleep(80);
-  check("inquire from painting: heading names the painting", $("#contact-title").textContent === "A conversation about Ruby");
-  fill("Asha", "asha@example.com", "About Ruby"); nextResponse = json(200, { success: true });
-  await submitAndWait();
-  check("inquire from painting: painting sent with the message", calls[0] && calls[0].body.artwork === "Ruby");
-  // ...and the plain Contact Us button does not carry it over
-  $("#contact").close(); w.location.hash = "#/"; await sleep(120);
+  check("painting view: no inquiry box or Inquire button", !$("#art-inquiry") && !d.querySelector("[data-inquire]"));
+  $("#artwork").close(); w.location.hash = "#/"; await sleep(120);
   reset(); d.querySelector("[data-contact]").click(); await sleep(80);
   fill("Asha", "asha@example.com", "General"); nextResponse = json(200, { success: true });
   await submitAndWait();
   check("plain Contact Us: no painting attached", calls[0] && !("artwork" in calls[0].body));
 
-  // 14. accessibility basics
+  // 14. no human check: the form has no hCaptcha and sends no captcha field
+  check("no hCaptcha: widget and script absent", !$(".h-captcha") && !d.querySelector('script[src*="web3forms.com/client"]') && !d.querySelector('script[src*="hcaptcha"]'));
+  check("no hCaptcha: no captcha token sent", b && !("h-captcha-response" in b));
+
+  // 15. accessibility basics
   check("labels tied to inputs", ["c-name","c-email","c-msg"].every(id => d.querySelector(`label[for="${id}"]`)));
   check("errors linked via aria-describedby", $("#c-email").getAttribute("aria-describedby") === "c-email-err");
   check("status region is live", status.getAttribute("role") === "status");

@@ -47,7 +47,6 @@ using screen readers). Shared details are set once near the bottom of the file:
 year: 2026,
 medium: "Mixed media on canvas",
 dimensions: "5 × 4 ft",
-availability: "Available",   // set to "Sold" to show "This painting has found a home."
 ```
 
 Any of these can also be set on an individual painting to override the shared value.
@@ -73,8 +72,6 @@ to paintedpoesybypriyanshi12@gmail.com. Settings are in `web3forms` at the top o
 - `subject`, `fromName`: the notification's subject line and sender display name. The
   visitor's address is sent as `email`, which Web3Forms uses as the Reply-To, so pressing
   Reply answers the visitor.
-- `hcaptcha`: the free hCaptcha check, loaded through Web3Forms. It must also be switched
-  on for the form in the Web3Forms dashboard.
 
 The free plan allows 250 submissions a month; Web3Forms emails a warning at 90% and 100%,
 and the dashboard at app.web3forms.com shows usage.

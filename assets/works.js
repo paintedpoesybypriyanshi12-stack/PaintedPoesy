@@ -22,9 +22,6 @@ window.SITE = {
     accessKey: "a2dce3ab-458c-4b43-8254-f53101a63f39",
     subject: "New inquiry — Painted Poesy by Priyanshi",
     fromName: "Painted Poesy website", // display name on the notification, never the visitor's
-    // Free hCaptcha spam check, loaded through Web3Forms' own script. It must
-    // ALSO be switched on for this form in the Web3Forms dashboard.
-    hcaptcha: true,
   },
 
   contactEmail: "paintedpoesybypriyanshi12@gmail.com",
@@ -40,7 +37,10 @@ window.WORKS = [
     association: "Sun · Surya",
     tagline: "The courage to take up space.",
     image: "images/works/ruby.jpg", alt: "Ruby, framed: a Navarathna painting in crimson and rose, with two crossing bands of deep red crystal.",
-    views: [],
+    views: [
+      { src: "images/detail/ruby-1.jpg", label: "Detail: faceted crimson crystals on the textured ground" },
+      { src: "images/detail/ruby-2.jpg", label: "Detail: crystals gathering beside a pink and gold swirl" },
+    ],
     statement: [
       "Ruby begins with a question about presence: what does it mean to stand fully within your own life?",
       "I approach this work through the idea of an inner center—the part of us that can remain steady without becoming rigid. I am interested in confidence that does not depend on spectacle, and strength that does not need to overpower everything around it.",
@@ -53,7 +53,10 @@ window.WORKS = [
     association: "Moon · Chandra",
     tagline: "Softness, with a presence of its own.",
     image: "images/works/pearl.jpg", alt: "Pearl, framed: a Navarathna painting in white, silver-grey, blush and lilac, scattered with raised pearl-like forms.",
-    views: [],
+    views: [
+      { src: "images/detail/pearl-1.jpg", label: "Detail: pearls among threads of red and lavender" },
+      { src: "images/detail/pearl-2.jpg", label: "Detail: pearls scattered across the marbled surface" },
+    ],
     statement: [
       "Pearl is my study of quiet attention.",
       "White, silver-gray, and delicate traces of blush and lilac move across the surface, while raised pearl-like forms interrupt the flow. Their shadows become part of the composition: small reminders that even a pale surface can hold depth and contrast.",
@@ -66,7 +69,10 @@ window.WORKS = [
     association: "Mars · Mangala",
     tagline: "Strength does not always arrive loudly.",
     image: "images/works/red-coral.jpg", alt: "Red Coral, framed: a Navarathna painting in blush pink and pale marbling, crossed by rose-toned crystal clusters.",
-    views: [],
+    views: [
+      { src: "images/detail/red-coral-1.jpg", label: "Detail: coral fragments and clear crystals on pink marbling" },
+      { src: "images/detail/red-coral-2.jpg", label: "Detail: a coral band beside the flowing pink" },
+    ],
     statement: [
       "In Red Coral, I explore the possibility that tenderness and resolve can occupy the same space.",
       "Blush-pink currents and pale marbling move around rose-toned, light-catching clusters. The color feels gentle; the surface has a more insistent presence. I am interested in what happens when those qualities coexist rather than compete.",
@@ -79,7 +85,10 @@ window.WORKS = [
     association: "Mercury · Budha",
     tagline: "A thought becoming a landscape.",
     image: "images/works/emerald.jpg", alt: "Emerald, framed: a Navarathna painting in emerald green with gold-veined currents and dark and bright green crystal clusters.",
-    views: [],
+    views: [
+      { src: "images/detail/emerald-1.jpg", label: "Detail: faceted emerald crystals over gold" },
+      { src: "images/detail/emerald-2.jpg", label: "Detail: emerald crystals meeting gold and green marbling" },
+    ],
     statement: [
       "Emerald is an exploration of connection.",
       "Green passages open into gold-veined currents, while darker and brighter clusters gather across the surface. My eye moves between them as though following an idea—finding a direction, losing it, and discovering another way through.",
@@ -92,7 +101,10 @@ window.WORKS = [
     association: "Jupiter · Brihaspati / Guru",
     tagline: "Making room for light.",
     image: "images/works/yellow-sapphire.jpg", alt: "Yellow Sapphire, framed: a Navarathna painting in gold and yellow currents around a concentrated field of reflective golden detail.",
-    views: [],
+    views: [
+      { src: "images/detail/yellow-sapphire-1.jpg", label: "Detail: golden crystals beside a yellow swirl" },
+      { src: "images/detail/yellow-sapphire-2.jpg", label: "Detail: clear and golden crystals over liquid yellow" },
+    ],
     statement: [
       "Yellow Sapphire begins with luminosity, but I wanted to give that brightness substance.",
       "Gold and yellow currents spread across the canvas around a concentrated field of reflective detail. Open passages and dense texture offer two different ways of experiencing the same light: one expansive, the other gathered and held.",
@@ -106,7 +118,10 @@ window.WORKS = [
     association: "Venus · Shukra",
     tagline: "Clarity without simplicity.",
     image: "images/works/diamond.jpg", alt: "Diamond, framed: a Navarathna painting in silver and white marbling around a large faceted field of clear crystal.",
-    views: [],
+    views: [
+      { src: "images/detail/diamond-1.jpg", label: "Detail: clear and silver crystals at the edge of the central form" },
+      { src: "images/detail/diamond-2.jpg", label: "Detail: the silver border meeting white and lavender marbling" },
+    ],
     statement: [
       "With Diamond, I am interested in a beauty that reveals itself through attention.",
       "The idea is not perfection as a flawless surface. It is the possibility that many facets—different, contrasting, sometimes difficult to reconcile—can belong to one whole.",
@@ -119,7 +134,10 @@ window.WORKS = [
     association: "Saturn · Shani",
     tagline: "Depth asks us to stay.",
     image: "images/works/blue-sapphire.jpg", alt: "Blue Sapphire, framed: a Navarathna painting in sea green and white marbling crossed by sweeping bands of cobalt crystal.",
-    views: [],
+    views: [
+      { src: "images/detail/blue-sapphire-1.jpg", label: "Detail: deep blue and teal crystals over the marbling" },
+      { src: "images/detail/blue-sapphire-2.jpg", label: "Detail: sapphire crystals over pale marbling" },
+    ],
     statement: [
       "Blue Sapphire is my exploration of patience.",
       "I am drawn to the kind of understanding that cannot be hurried: the perspective that develops through repetition, attention, and time.",
@@ -162,5 +180,4 @@ window.WORKS = [
   year: 2026,                         // year completed
   medium: "Mixed media on canvas",
   dimensions: "5 × 4 ft",
-  availability: "Available",          // "Available" or "Sold"
 }, w));
