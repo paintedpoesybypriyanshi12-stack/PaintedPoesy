@@ -262,7 +262,7 @@ body:not(.is-home)::before {
 .closer h2 { max-width: 20ch; }
 .closer .actions { margin-top: .5rem; }
 
-/* ---------- Privacy / not found ---------- */
+/* ---------- Not found ---------- */
 .legal { max-width: 44rem; padding-block: clamp(3rem, 8vw, 6rem) 0; }
 .legal h1 { font-size: var(--step-3); margin-block: .8rem 1.5rem; }
 .legal h2 { font: 600 var(--step-0)/1.4 var(--sans); margin-block: 2rem .5rem; }

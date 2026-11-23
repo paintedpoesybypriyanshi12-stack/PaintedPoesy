@@ -8,7 +8,7 @@
    veins and the faceted crystals. The view breathes and drifts very slightly.
    Every motion is periodic: a seamless 90-second loop that opens on the same frame. */
 (function () {
-  const IMG = "images/flow/sapphire-full.jpg?v=23";
+  const IMG = "images/flow/sapphire-full.jpg?v=24";
   const LOOP = 90;
 
   const VERT = `attribute vec2 a; void main(){ gl_Position = vec4(a,0.,1.); }`;

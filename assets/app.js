@@ -10,7 +10,6 @@
   $("#year").textContent = new Date().getFullYear();
   if (SITE.instagram) { const ig = $("#foot-ig"); ig.href = SITE.instagram; ig.hidden = false; }
   if (SITE.contactEmail) {
-    const p = $("#privacy-email"); p.textContent = SITE.contactEmail; p.classList.remove("todo");
     const m = $("#foot-email"); m.textContent = SITE.contactEmail; m.href = "mailto:" + SITE.contactEmail; m.hidden = false;
   }
 
@@ -54,7 +53,6 @@
   document.addEventListener("click", e => {
     const t = e.target;
     const c = t.closest("[data-close]"); if (c) closeDialog(c.closest("dialog"));
-    if (t.closest("[data-close-link]")) closeDialog(contactDlg);
     if (t.closest("[data-contact]")) openContact();
     const w = t.closest("[data-work]"); if (w) location.hash = "#/navarathna/" + w.dataset.work;
     const j = t.closest("[data-jump]");
@@ -239,7 +237,6 @@
     home: "Painted Poesy by Priyanshi | Contemporary Mixed-Media Art",
     about: "About Priyanshi Pandey | Painted Poesy",
     navarathna: "Navarathna Series | Nine Gems in Contemporary Abstraction",
-    privacy: "Privacy Notice | Painted Poesy by Priyanshi",
     notfound: "Page not found | Painted Poesy by Priyanshi",
   };
   function route() {

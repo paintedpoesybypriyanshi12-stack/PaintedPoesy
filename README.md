@@ -14,7 +14,6 @@ Planned address: `paintedpoesybypriyanshi.com` (domain not yet connected).
 | **About Me** | Priyanshi's story, practice and process, with close-up photographs. |
 | **Navarathna** | The series introduction, the tradition behind it, and all nine works with their descriptions. Each painting opens into a larger view. |
 | **Contact Us** | A pop-up form, available from every page. |
-| **Privacy** | The privacy notice, linked from the footer. |
 
 It is a plain static website: HTML, CSS and JavaScript with no build step, so it can
 be hosted on any static host. It adapts to phones, tablets and
@@ -23,7 +22,7 @@ laptops, and follows the visitor's light or dark setting on the inner pages.
 ## Folder layout
 
 ```
-index.html                 All pages (Home, About, Navarathna, Privacy) in one file
+index.html                 All pages (Home, About, Navarathna) in one file
 assets/
   works.js                 ← Site settings and all painting details (edit this one)
   app.js                   Page switching, gallery, pop-ups, contact form
@@ -83,12 +82,7 @@ nothing and delivers no email. Run a local server (below) and open
 Only a real submission proves an email arrives.
 
 **Draft markers.** While `draft: true` is set at the top of `works.js`, unconfirmed
-details show a small "To confirm" tag and the privacy notice shows its bracketed
-placeholders. Set it to `false` before launch.
-
-**Privacy notice.** The bracketed parts in the Privacy section of `index.html` (hosting
-provider, form provider, analytics, retention, privacy requests) need filling in to
-match the services actually used.
+details show a small "To confirm" tag. Set it to `false` before launch.
 
 ## Seeing changes in a browser
 
